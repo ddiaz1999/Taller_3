@@ -111,7 +111,7 @@ def filter_Gaussian_noise(noisy_image, original_img, show_filters=False, show_ti
 
     if show_ECM:
         show_table('Mean Square Error: Gaussian Noise', ['Filter', 'Mean Square Error'],
-                   ECM, ['Gaussian', 'Median', 'Bilateral', 'NLM'], sn=False)
+                   ECM, ['Gaussian', 'Median', 'Bilateral', 'NLM'], sn=True)
 
     return times_gaussian_noise_filtered, estimation_gaussian_noise_filtered, ECM
 
@@ -165,7 +165,7 @@ def filter_SP_noise(noisy_image, original_img, show_filters=False, show_times=Fa
 
     if show_ECM:
         show_table('Mean Square Error: Salt & Peper Noise', ['Filter', 'Mean Square Error'],
-                   ECM, ['Gaussian', 'Median', 'Bilateral', 'NLM'], sn=False)
+                   ECM, ['Gaussian', 'Median', 'Bilateral', 'NLM'], sn=True)
 
     return times_gaussian_noise_filtered, estimation_gaussian_noise_filtered, ECM
 
@@ -196,7 +196,7 @@ if __name__ == '__main__':
                                                show_filters=False,
                                                show_times=False,
                                                show_noise_estimation=False,
-                                               show_ECM=False)
+                                               show_ECM=True)
 
     times_sp_noise_filtered,\
     estimation_sp_noise_filtered,\
