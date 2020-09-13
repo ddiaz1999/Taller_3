@@ -37,6 +37,8 @@ from prettytable import PrettyTable
 #                                   FUNCTIONS                                  #
 #------------------------------------------------------------------------------#
 
+# ------------------------------- SUBPLOT IMAGE ------------------------------ #
+
 def subplot_image(image1, image2, label1, label2):
     bg_color = [0, 0, 0]
     font = cv2.FONT_HERSHEY_COMPLEX
@@ -46,6 +48,9 @@ def subplot_image(image1, image2, label1, label2):
     image2_padding = cv2.putText(image2_padding.copy(), label2, (int(0.25 * image1_padding.shape[0]), 30), font, 1, [255, 0, 0])
     image = cv2.hconcat((image1_padding, image2_padding))
     return image
+
+
+# --------------------------------- SHOW TABLE ------------------------------- #
 
 def show_table(title, header, values, labels, sn=False):
 
@@ -58,15 +63,25 @@ def show_table(title, header, values, labels, sn=False):
     print('\n'+ title)
     print(table, '\n')
 
-def filter_Gaussian_noise(noisy_image, show_filters=False, show_times=False, show_noise_estimation=False):
+
+
+# --------------------------- FILTER GAUSSIAN NOISE -------------------------- #
+
+def filter_Gaussian_noise(noisy_image, original_img, show_filters=False, show_times=False, show_noise_estimation=False, show_ECM=False):
 
     # FILTRADO DE RUIDO GAUSSIANO
-    gaussian_noisy_filtered = filter(noisy_image)
+    gaussian_noisy_filtered = filter(noisy_image, original_img)
 
-    noisy_filtered_gaussian, gaussian_time, gaussian_estimate_noise = gaussian_noisy_filtered.filter_type('gaussian')
-    noisy_filtered_median, median_time, median_estimate_noise = gaussian_noisy_filtered.filter_type('median')
-    noisy_filtered_bilateral, bilateral_time, bilateral_estimate_noise = gaussian_noisy_filtered.filter_type('bilateral')
-    noisy_filtered_nlm, nlm_time, nlm_estimate_noise = gaussian_noisy_filtered.filter_type('nlm')
+    noisy_filtered_gaussian, gaussian_time,\
+    gaussian_estimate_noise, gaussian_ECM = gaussian_noisy_filtered.filter_type('gaussian')
+
+    noisy_filtered_median, median_time,\
+    median_estimate_noise, median_ECM = gaussian_noisy_filtered.filter_type('median')
+
+    noisy_filtered_bilateral, bilateral_time,\
+    bilateral_estimate_noise, bilateral_ECM = gaussian_noisy_filtered.filter_type('bilateral')
+
+    noisy_filtered_nlm, nlm_time, nlm_estimate_noise, nlm_ECM = gaussian_noisy_filtered.filter_type('nlm')
 
     if show_filters:
         cv2.imshow('Gaussian Noise - Gaussian Filter', subplot_image(noisy_image, noisy_filtered_gaussian, 'Gaussian Noise', 'Gaussian Filter'))
@@ -78,6 +93,7 @@ def filter_Gaussian_noise(noisy_image, show_filters=False, show_times=False, sho
 
     times_gaussian_noise_filtered = [gaussian_time, median_time, bilateral_time, nlm_time]
     estimation_gaussian_noise_filtered = [gaussian_estimate_noise, median_estimate_noise, bilateral_estimate_noise, nlm_estimate_noise]
+    ECM = [gaussian_ECM, median_ECM, bilateral_ECM, nlm_ECM]
 
     if show_times:
         show_table('Execution time of filters: Gaussian Noise', ['Filter', 'Execution time (s)'],
@@ -93,18 +109,30 @@ def filter_Gaussian_noise(noisy_image, show_filters=False, show_times=False, sho
 
         cv2.waitKey(0)
 
-    return times_gaussian_noise_filtered, estimation_gaussian_noise_filtered
+    if show_ECM:
+        show_table('Mean Square Error: Gaussian Noise', ['Filter', 'Mean Square Error'],
+                   ECM, ['Gaussian', 'Median', 'Bilateral', 'NLM'], sn=False)
+
+    return times_gaussian_noise_filtered, estimation_gaussian_noise_filtered, ECM
 
 
-def filter_SP_noise(noisy_image, show_filters=False, show_times=False, show_noise_estimation=False):
+# ------------------------- FILTER SALT & PEPER NOISE ------------------------ #
+
+def filter_SP_noise(noisy_image, original_img, show_filters=False, show_times=False, show_noise_estimation=False, show_ECM=False):
 
     # FILTRADO A RUIDO S&P
-    sp_noisy_filtered = filter(lena_sp_noisy)
+    sp_noisy_filtered = filter(lena_sp_noisy, original_img)
 
-    noisy_filtered_gaussian, gaussian_time, gaussian_estimate_noise = sp_noisy_filtered.filter_type('gaussian')
-    noisy_filtered_median, median_time, median_estimate_noise = sp_noisy_filtered.filter_type('median')
-    noisy_filtered_bilateral, bilateral_time, bilateral_estimate_noise  = sp_noisy_filtered.filter_type('bilateral')
-    noisy_filtered_nlm, nlm_time, nlm_estimate_noise = sp_noisy_filtered.filter_type('nlm')
+    noisy_filtered_gaussian, gaussian_time,\
+    gaussian_estimate_noise, gaussian_ECM = sp_noisy_filtered.filter_type('gaussian')
+
+    noisy_filtered_median, median_time,\
+    median_estimate_noise, median_ECM = sp_noisy_filtered.filter_type('median')
+
+    noisy_filtered_bilateral, bilateral_time,\
+    bilateral_estimate_noise, bilateral_ECM  = sp_noisy_filtered.filter_type('bilateral')
+
+    noisy_filtered_nlm, nlm_time, nlm_estimate_noise, nlm_ECM = sp_noisy_filtered.filter_type('nlm')
 
     if show_filters:
         cv2.imshow('S&P Noise - Gaussian Filter', subplot_image(lena_sp_noisy, noisy_filtered_gaussian, 'S&P Noise', ' Gaussian Filter'))
@@ -116,6 +144,7 @@ def filter_SP_noise(noisy_image, show_filters=False, show_times=False, show_nois
 
     times_SP_noise_filtered = [gaussian_time, median_time, bilateral_time, nlm_time]
     estimation_SP_noise_filtered = [gaussian_estimate_noise, median_estimate_noise, bilateral_estimate_noise, nlm_estimate_noise]
+    ECM = [gaussian_ECM, median_ECM, bilateral_ECM, nlm_ECM]
 
     if show_times:
         show_table('Execution time of filters: Salt & Peper Noise', ['Filter', 'Execution time (s)'],
@@ -134,7 +163,11 @@ def filter_SP_noise(noisy_image, show_filters=False, show_times=False, show_nois
 
         cv2.waitKey(0)
 
-    return times_gaussian_noise_filtered, estimation_gaussian_noise_filtered
+    if show_ECM:
+        show_table('Mean Square Error: Salt & Peper Noise', ['Filter', 'Mean Square Error'],
+                   ECM, ['Gaussian', 'Median', 'Bilateral', 'NLM'], sn=False)
+
+    return times_gaussian_noise_filtered, estimation_gaussian_noise_filtered, ECM
 
 
 #------------------------------------------------------------------------------#
@@ -156,12 +189,20 @@ if __name__ == '__main__':
     cv2.imshow('Lena noises', subplot_image(lena_gaussian_noisy, lena_sp_noisy, 'Gaussian Noise', 'Salt-peper Noise'))
     cv2.waitKey(0)
     
-    times_gaussian_noise_filtered, estimation_gaussian_noise_filtered = filter_Gaussian_noise(lena_gaussian_noisy,
-                                                                            show_filters=False,
-                                                                            show_times=False,
-                                                                            show_noise_estimation=False)
+    times_gaussian_noise_filtered,\
+    estimation_gaussian_noise_filtered,\
+    ECM_Gaussian_Noise = filter_Gaussian_noise(lena_gaussian_noisy,
+                                               image_lena_gray,
+                                               show_filters=False,
+                                               show_times=False,
+                                               show_noise_estimation=False,
+                                               show_ECM=False)
 
-    times_sp_noise_filtered, estimation_sp_noise_filtered = filter_SP_noise(lena_sp_noisy,
-                                                                            show_filters=True,
-                                                                            show_times=False,
-                                                                            show_noise_estimation=False)
+    times_sp_noise_filtered,\
+    estimation_sp_noise_filtered,\
+    ECM_SP_Noise = filter_SP_noise(lena_sp_noisy,
+                                   image_lena_gray,
+                                   show_filters=False,
+                                   show_times=False,
+                                   show_noise_estimation=False,
+                                   show_ECM=False)
