@@ -31,7 +31,6 @@
 
 import cv2
 
-
 #------------------------------------------------------------------------------#
 #                                  FILTER CLASS                                #
 #------------------------------------------------------------------------------#
@@ -52,10 +51,16 @@ class filter:
             median_filtered = cv2.medianBlur(self.__image_noisy, kernel_size)
             return median_filtered
 
-        if filter_type == 'bilateral':
-            bilateral_filtered = cv2.bilateralFilter(self.__image_noisy, 15, 25, 25)
+        elif filter_type == 'bilateral':
+            d = 15
+            sigmaColor = 25
+            sigmaSpace = 25
+            bilateral_filtered = cv2.bilateralFilter(self.__image_noisy, d, sigmaColor, sigmaSpace)
             return bilateral_filtered
 
         elif filter_type == 'nlm':
-            nlm_filtered = cv2.fastNlMeansDenoising(self.__image_noisy, 5, 15, 25)
+            h = 5
+            windowSize = 15
+            searchSize = 25
+            nlm_filtered = cv2.fastNlMeansDenoising(self.__image_noisy, h, windowSize, searchSize)
             return nlm_filtered

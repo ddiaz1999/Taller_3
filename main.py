@@ -52,8 +52,8 @@ def subplot_image(image1, image2, label1, label2):
 
 if __name__ == '__main__':
 
-    path_file = r'C:\Users\lenovo\Desktop\JHON_2030\PROCESAMIENTO_DE_IMAGENES\Talleres\Semana_6\Taller\lena.png'
-    #path_file = r'C:\Users\di-di\OneDrive\Escritorio\imagenes_vision\lena.jpg'
+    #path_file = r'C:\Users\lenovo\Desktop\JHON_2030\PROCESAMIENTO_DE_IMAGENES\Talleres\Semana_6\Taller\lena.png'
+    path_file = r'C:\Users\di-di\OneDrive\Escritorio\imagenes_vision\lena.jpg'
     image_lena = cv2.imread(path_file, 1)
     image_lena_gray = cv2.cvtColor(image_lena, cv2.COLOR_BGR2GRAY)
     image_lena_noisy = noise_generator(image_lena_gray.astype(np.float) / 255)
