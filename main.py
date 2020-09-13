@@ -1,5 +1,5 @@
 from noise import *
-import cv2
+from filters import *
 import os
 
 if __name__ == '__main__':
@@ -14,4 +14,21 @@ if __name__ == '__main__':
     lena_sp_noisy = (255 * lena_sp_noisy).astype(np.uint8)
     cv2.imshow('ruido gaussiano',lena_gauss_noisy)
     cv2.imshow('ruido s&p',lena_sp_noisy)
+
+
+    ##FILTRADO DE RUIDO GAUSSIANO
+    lena_gauss_noisy_filtered = filter(lena_gauss_noisy)
+    lena_gauss_noisy_filtered_bilateral = lena_gauss_noisy_filtered.filter_type('bilateral')
+    lena_gauss_noisy_filtered_nlm = lena_gauss_noisy_filtered.filter_type('nlm')
+    cv2.imshow('bilateral',lena_gauss_noisy_filtered_bilateral)
+    cv2.imshow('nlm', lena_gauss_noisy_filtered_nlm)
+
+    #FILTRADO A RUIDO S&P
+    lena_sp_noisy_filtered = filter(lena_sp_noisy)
+    lena_sp_noisy_filtered_bilateral = lena_sp_noisy_filtered.filter_type('bilateral')
+    lena_sp_noisy_filtered_nlm = lena_sp_noisy_filtered.filter_type('nlm')
+    cv2.imshow('bilateral', lena_sp_noisy_filtered_bilateral)
+    cv2.imshow('nlm', lena_sp_noisy_filtered_nlm)
+
+
     cv2.waitKey(0)
