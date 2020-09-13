@@ -47,16 +47,94 @@ def subplot_image(image1, image2, label1, label2):
     image = cv2.hconcat((image1_padding, image2_padding))
     return image
 
-def show_times(time, labels, title):
-    time_table = PrettyTable(["Filter", "Execution time (s)"])
-    for i, t in enumerate(time):
-        time[i] = '%.2E' % Decimal(str(t))
-    time_table.add_row([labels[0], time[0]])
-    time_table.add_row([labels[1], time[1]])
-    time_table.add_row([labels[2], time[2]])
-    time_table.add_row([labels[3], time[3]])
-    print('\n Execution time: filters to '+ title)
-    print(time_table, '\n')
+def show_table(title, header, values, labels, sn=False):
+
+    table = PrettyTable(header)
+    if sn:
+        for i, t in enumerate(values):
+            values[i] = '%.2E' % Decimal(str(t))
+    for i, l in enumerate(labels):
+        table.add_row([l, values[i]])
+    print('\n'+ title)
+    print(table, '\n')
+
+def filter_Gaussian_noise(noisy_image, show_filters=False, show_times=False, show_noise_estimation=False):
+
+    # FILTRADO DE RUIDO GAUSSIANO
+    gaussian_noisy_filtered = filter(noisy_image)
+
+    noisy_filtered_gaussian, gaussian_time, gaussian_estimate_noise = gaussian_noisy_filtered.filter_type('gaussian')
+    noisy_filtered_median, median_time, median_estimate_noise = gaussian_noisy_filtered.filter_type('median')
+    noisy_filtered_bilateral, bilateral_time, bilateral_estimate_noise = gaussian_noisy_filtered.filter_type('bilateral')
+    noisy_filtered_nlm, nlm_time, nlm_estimate_noise = gaussian_noisy_filtered.filter_type('nlm')
+
+    if show_filters:
+        cv2.imshow('Gaussian Noise - Gaussian Filter', subplot_image(noisy_image, noisy_filtered_gaussian, 'Gaussian Noise', 'Gaussian Filter'))
+        cv2.imshow('Gaussian Noise - Median Filter', subplot_image(noisy_image, noisy_filtered_median, 'Gaussian Noise', 'Median Filter'))
+        cv2.imshow('Gaussian Noise - Bilateral Filter', subplot_image(noisy_image, noisy_filtered_bilateral, 'Gaussian Noise', 'Bilateral Filter'))
+        cv2.imshow('Gaussian Noise - NLM Filter', subplot_image(noisy_image, noisy_filtered_nlm, 'Gaussian Noise', 'NLM Filter'))
+
+        cv2.waitKey(0)
+
+    times_gaussian_noise_filtered = [gaussian_time, median_time, bilateral_time, nlm_time]
+    estimation_gaussian_noise_filtered = [gaussian_estimate_noise, median_estimate_noise, bilateral_estimate_noise, nlm_estimate_noise]
+
+    if show_times:
+        show_table('Execution time of filters: Gaussian Noise', ['Filter', 'Execution time (s)'],
+                   times_gaussian_noise_filtered,
+                   ['Gaussian', 'Median', 'Bilateral', 'NLM'], sn=True)
+
+    if show_noise_estimation:
+        cv2.imshow('Gaussian Noise - Gaussian Filter: Noise estimation',
+                   subplot_image(noisy_image, gaussian_estimate_noise, 'Gaussian Noise', 'Gaussian Filter'))
+        cv2.imshow('Gaussian Noise - Median Filter', subplot_image(noisy_image, median_estimate_noise, 'Gaussian Noise', 'Median Filter'))
+        cv2.imshow('Gaussian Noise - Bilateral Filter', subplot_image(noisy_image, bilateral_estimate_noise, 'Gaussian Noise', 'Bilateral Filter'))
+        cv2.imshow('Gaussian Noise - NLM Filter', subplot_image(noisy_image, nlm_estimate_noise, 'Gaussian Noise', 'NLM Filter'))
+
+        cv2.waitKey(0)
+
+    return times_gaussian_noise_filtered, estimation_gaussian_noise_filtered
+
+
+def filter_SP_noise(noisy_image, show_filters=False, show_times=False, show_noise_estimation=False):
+
+    # FILTRADO A RUIDO S&P
+    sp_noisy_filtered = filter(lena_sp_noisy)
+
+    noisy_filtered_gaussian, gaussian_time, gaussian_estimate_noise = sp_noisy_filtered.filter_type('gaussian')
+    noisy_filtered_median, median_time, median_estimate_noise = sp_noisy_filtered.filter_type('median')
+    noisy_filtered_bilateral, bilateral_time, bilateral_estimate_noise  = sp_noisy_filtered.filter_type('bilateral')
+    noisy_filtered_nlm, nlm_time, nlm_estimate_noise = sp_noisy_filtered.filter_type('nlm')
+
+    if show_filters:
+        cv2.imshow('S&P Noise - Gaussian Filter', subplot_image(lena_sp_noisy, noisy_filtered_gaussian, 'S&P Noise', ' Gaussian Filter'))
+        cv2.imshow('S&P Noise - Median Filter', subplot_image(lena_sp_noisy, noisy_filtered_median, 'S&P Noise', 'Median Filter'))
+        cv2.imshow('S&P Noise - Bilateral Filter', subplot_image(lena_sp_noisy, noisy_filtered_bilateral, 'S&P Noise', 'Bilateral Filter'))
+        cv2.imshow('S&P Noise - NLM Filter', subplot_image(lena_sp_noisy, noisy_filtered_nlm, 'S&P Noise', 'NLM Filter'))
+
+        cv2.waitKey(0)
+
+    times_SP_noise_filtered = [gaussian_time, median_time, bilateral_time, nlm_time]
+    estimation_SP_noise_filtered = [gaussian_estimate_noise, median_estimate_noise, bilateral_estimate_noise, nlm_estimate_noise]
+
+    if show_times:
+        show_table('Execution time of filters: Salt & Peper Noise', ['Filter', 'Execution time (s)'],
+                   times_SP_noise_filtered,
+                   ['Gaussian', 'Median', 'Bilateral', 'NLM'], sn=True)
+
+    if show_noise_estimation:
+        cv2.imshow('S&P Noise - Gaussian Filter: Noise estimation',
+                   subplot_image(noisy_image, gaussian_estimate_noise, 'S&P Noise', 'Noise estimation: Gaussian Filter'))
+        cv2.imshow('S&P Noise - Median Filter: Noise estimation',
+                   subplot_image(noisy_image, median_estimate_noise, 'S&P Noise', 'Noise estimation: Median Filter'))
+        cv2.imshow('S&P Noise - Bilateral Filter: Noise estimation',
+                   subplot_image(noisy_image, bilateral_estimate_noise, 'S&P Noise', 'Noise estimation: Bilateral Filter'))
+        cv2.imshow('S&P Noise - NLM Filter: Noise estimation',
+                   subplot_image(noisy_image, nlm_estimate_noise, 'S&P Noise', 'Noise estimation: NLM Filter'))
+
+        cv2.waitKey(0)
+
+    return times_gaussian_noise_filtered, estimation_gaussian_noise_filtered
 
 
 #------------------------------------------------------------------------------#
@@ -74,32 +152,16 @@ if __name__ == '__main__':
     lena_sp_noisy = image_lena_noisy.noise('s&p')
     lena_gaussian_noisy = (255 * lena_gaussian_noisy).astype(np.uint8)
     lena_sp_noisy = (255 * lena_sp_noisy).astype(np.uint8)
+
     cv2.imshow('Lena noises', subplot_image(lena_gaussian_noisy, lena_sp_noisy, 'Gaussian Noise', 'Salt-peper Noise'))
-
-    #FILTRADO DE RUIDO GAUSSIANO
-    lena_gaussian_noisy_filtered = filter(lena_gaussian_noisy)
-    lena_gaussian_noisy_filtered_gaussian, Gn_gaussian_time = lena_gaussian_noisy_filtered.filter_type('gaussian')
-    lena_gaussian_noisy_filtered_median, Gn_median_time = lena_gaussian_noisy_filtered.filter_type('median')
-    lena_gaussian_noisy_filtered_bilateral, Gn_bilateral_time = lena_gaussian_noisy_filtered.filter_type('bilateral')
-    lena_gaussian_noisy_filtered_nlm, Gn_nlm_time = lena_gaussian_noisy_filtered.filter_type('nlm')
-    #cv2.imshow('Gaussian Noise - Gaussian Filter', subplot_image(lena_gaussian_noisy, lena_gaussian_noisy_filtered_gaussian, 'Gaussian Noise', 'Gaussian Filter'))
-    #cv2.imshow('Gaussian Noise - Median Filter', subplot_image(lena_gaussian_noisy, lena_gaussian_noisy_filtered_median, 'Gaussian Noise', 'Median Filter'))
-    #cv2.imshow('Gaussian Noise - Bilateral Filter', subplot_image(lena_gaussian_noisy, lena_gaussian_noisy_filtered_bilateral, 'Gaussian Noise', 'Bilateral Filter'))
-    #cv2.imshow('Gaussian Noise - NLM Filter', subplot_image(lena_gaussian_noisy, lena_gaussian_noisy_filtered_nlm, 'Gaussian Noise', 'NLM Filter'))
-
-    show_times([Gn_gaussian_time, Gn_median_time, Gn_bilateral_time, Gn_nlm_time], ['Gaussian', 'Median', 'Bilateral', 'NLM'], 'Gaussian Noise')
-
-    # #FILTRADO A RUIDO S&P
-    # lena_sp_noisy_filtered = filter(lena_sp_noisy)
-    # lena_sp_noisy_filtered_gaussian, SPn_gaussian_time = lena_sp_noisy_filtered.filter_type('gaussian')
-    # lena_sp_noisy_filtered_median, SPn_median_time = lena_sp_noisy_filtered.filter_type('median')
-    # lena_sp_noisy_filtered_bilateral, SPn_bilateral_time  = lena_sp_noisy_filtered.filter_type('bilateral')
-    # lena_sp_noisy_filtered_nlm, SPn_bilateral_time = lena_sp_noisy_filtered.filter_type('nlm')
-    # cv2.imshow('S&P Noise - Gaussian Filter', subplot_image(lena_sp_noisy, lena_sp_noisy_filtered_gaussian, 'S&P Noise', 'Gaussian Filter'))
-    # cv2.imshow('S&P Noise - Median Filter', subplot_image(lena_sp_noisy, lena_sp_noisy_filtered_median, 'S&P Noise', 'Median Filter'))
-    # cv2.imshow('S&P Noise - Bilateral Filter', subplot_image(lena_sp_noisy, lena_sp_noisy_filtered_bilateral, 'S&P Noise', 'Bilateral Filter'))
-    # cv2.imshow('S&P Noise - NLM Filter', subplot_image(lena_sp_noisy, lena_sp_noisy_filtered_nlm, 'S&P Noise', 'NLM Filter'))
-
-    show_times([Gn_gaussian_time, Gn_median_time, Gn_bilateral_time, Gn_nlm_time], ['Gaussian', 'Median', 'Bilateral', 'NLM'], 'Gaussian Noise')
-
     cv2.waitKey(0)
+    
+    times_gaussian_noise_filtered, estimation_gaussian_noise_filtered = filter_Gaussian_noise(lena_gaussian_noisy,
+                                                                            show_filters=False,
+                                                                            show_times=False,
+                                                                            show_noise_estimation=False)
+
+    times_sp_noise_filtered, estimation_sp_noise_filtered = filter_SP_noise(lena_sp_noisy,
+                                                                            show_filters=True,
+                                                                            show_times=False,
+                                                                            show_noise_estimation=False)

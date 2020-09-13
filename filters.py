@@ -72,13 +72,24 @@ class filter:
         elapsed_time = time() - start_time
         return function_return, elapsed_time
 
+    def __time_execution(self, function_filter):
+        start_time = time()
+        function_return = function_filter()
+        elapsed_time = time() - start_time
+        return function_return, elapsed_time
+
+
     def filter_type(self, filter_type):
         if filter_type == 'gaussian':
             Filter, time = self.__time_execution(self.__Gaussian_filter)
+            noise_estimation = abs(Filter - self.__image_noisy)
         elif filter_type == 'median':
             Filter, time =  self.__time_execution(self.__Median_filter)
+            noise_estimation = abs(Filter - self.__image_noisy)
         elif filter_type == 'bilateral':
             Filter, time = self.__time_execution(self.__Bilateral_filter)
+            noise_estimation = abs(Filter - self.__image_noisy)
         elif filter_type == 'nlm':
             Filter, time = self.__time_execution(self.__NLM_filter)
-        return Filter, time
+            noise_estimation = abs(Filter - self.__image_noisy)
+        return Filter, time, noise_estimation
