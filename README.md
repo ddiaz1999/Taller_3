@@ -1,2 +1,2 @@
-# Taller_3_Procesamiento_imag_Vision
+# Taller_3
 Taller Imagenes y visión: filtrado de imagenes
