@@ -54,18 +54,20 @@ def subplot_image(image1, image2, label1, label2):
 
 def show_table(title, header, values, labels, sn=False):
 
+    values_copy = values
     table = PrettyTable(header)
     if sn:
-        for i, t in enumerate(values):
-            values[i] = '%.2E' % Decimal(str(t))
-    for i, l in enumerate(labels):
-        table.add_row([l, values[i]])
+        for i, t in enumerate(values_copy):
+            values_copy[i] = '%.3E' % Decimal(str(t))
+    for j, l in enumerate(labels):
+        table.add_row([l, values_copy[j]])
     print('\n'+ title)
     print(table, '\n')
 
 # --------------------------- FILTER GAUSSIAN NOISE -------------------------- #
 
-def filter_Gaussian_noise(noisy_image, original_img, show_filters=False, show_times=False, show_noise_estimation=False, show_ECM=False):
+def filter_Gaussian_noise(noisy_image, original_img, show_filters=False, show_times=False,
+                          show_times_percentage=False, show_noise_estimation=False, show_sqrt_ECM=False):
 
     # FILTRADO DE RUIDO GAUSSIANO
     gaussian_noisy_filtered = filter(noisy_image, original_img)
@@ -98,6 +100,18 @@ def filter_Gaussian_noise(noisy_image, original_img, show_filters=False, show_ti
                    times_gaussian_noise_filtered,
                    ['Gaussian', 'Median', 'Bilateral', 'NLM'], sn=True)
 
+    if show_times_percentage:
+        filters = ['Gaussian', 'Median', 'Bilateral', 'NLM']
+        times_gaussian_noise_filtered = list(map(float, times_gaussian_noise_filtered))
+        times_sort = times_gaussian_noise_filtered
+        times_sort.sort()
+        max_speed = min(times_sort)
+        times_percentage = (100.0 * max_speed) / np.asarray(times_sort)
+        print('Percetanges of speed of filter taking minimum time as reference: ')
+        show_table('Execution time percentage of filters: Gaussian Noise', ['Filter', 'Percentaje time (%)'],
+                   times_percentage, filters, sn=True)
+        times_gaussian_noise_filtered = list(map(float, times_gaussian_noise_filtered))
+
     if show_noise_estimation:
         cv2.imshow('Gaussian Noise - Gaussian Filter: Noise estimation',
                    subplot_image(noisy_image, gaussian_estimate_noise, 'Gaussian Noise', 'Noise estimation: Gaussian'))
@@ -107,9 +121,10 @@ def filter_Gaussian_noise(noisy_image, original_img, show_filters=False, show_ti
 
         cv2.waitKey(0)
 
-    if show_ECM:
+    if show_sqrt_ECM:
         show_table('Square Root Mean Square Error: Gaussian Noise', ['Filter', 'Square Root Mean Square Error'],
-                   ECM, ['Gaussian', 'Median', 'Bilateral', 'NLM'], sn=False)
+                   ECM, ['Gaussian', 'Median', 'Bilateral', 'NLM'], sn=True)
+        ECM = list(map(float, ECM))
         filters = ['Gaussian', 'Median', 'Bilateral', 'NLM']
         print(f'The filter with the lowest sqrt(ECM) is {filters[ECM.index(min(ECM))]} with {min(ECM)}')
 
@@ -118,7 +133,8 @@ def filter_Gaussian_noise(noisy_image, original_img, show_filters=False, show_ti
 
 # ------------------------- FILTER SALT & PEPER NOISE ------------------------ #
 
-def filter_SP_noise(noisy_image, original_img, show_filters=False, show_times=False, show_noise_estimation=False, show_ECM=False):
+def filter_SP_noise(noisy_image, original_img, show_filters=False, show_times=False,
+                    show_times_percentage=False, show_noise_estimation=False, show_sqrt_ECM=False):
 
     # FILTRADO A RUIDO S&P
     sp_noisy_filtered = filter(lena_sp_noisy, original_img)
@@ -150,6 +166,19 @@ def filter_SP_noise(noisy_image, original_img, show_filters=False, show_times=Fa
         show_table('Execution time of filters: Salt & Peper Noise', ['Filter', 'Execution time (s)'],
                    times_SP_noise_filtered,
                    ['Gaussian', 'Median', 'Bilateral', 'NLM'], sn=True)
+        times_SP_noise_filtered = list(map(float, times_SP_noise_filtered))
+
+    if show_times_percentage:
+        filters = ['Gaussian', 'Median', 'Bilateral', 'NLM']
+        times_SP_noise_filtered = list(map(float, times_SP_noise_filtered))
+        times_sort = times_SP_noise_filtered
+        times_sort.sort()
+        max_speed = min(times_sort)
+        times_percentage = (100.0 * max_speed) / np.asarray(times_sort)
+        print('Percetanges of speed of filter taking minimum time as reference: ')
+        show_table('Execution time percentage of filters: Salt & Peper Noise', ['Filter', 'Percentaje time (%)'],
+                   times_percentage, filters, sn=True)
+        times_SP_noise_filtered = list(map(float, times_SP_noise_filtered))
 
     if show_noise_estimation:
         cv2.imshow('S&P Noise - Gaussian Filter: Noise estimation',
@@ -163,10 +192,11 @@ def filter_SP_noise(noisy_image, original_img, show_filters=False, show_times=Fa
 
         cv2.waitKey(0)
 
-    if show_ECM:
+    if show_sqrt_ECM:
         show_table('Square Root Mean Square Error: Salt & Peper Noise', ['Filter', 'Square Root Mean Square Error'],
-                   ECM, ['Gaussian', 'Median', 'Bilateral', 'NLM'], sn=False)
+                   ECM, ['Gaussian', 'Median', 'Bilateral', 'NLM'], sn=True)
 
+        ECM = list(map(float, ECM))
         filters = ['Gaussian', 'Median', 'Bilateral', 'NLM']
         print(f'The filter with the lowest sqrt(ECM) is {filters[ECM.index(min(ECM))]} with {min(ECM)}')
 
@@ -180,8 +210,8 @@ def filter_SP_noise(noisy_image, original_img, show_filters=False, show_times=Fa
 if __name__ == '__main__':
 
     filters = ['Gaussian', 'Median', 'Bilateral', 'NLM']
-    #path_file = r'C:\Users\lenovo\Desktop\JHON_2030\PROCESAMIENTO_DE_IMAGENES\Talleres\Semana_6\Taller\lena.png'
-    path_file = r'C:\Users\di-di\OneDrive\Escritorio\imagenes_vision\lena.jpg'
+    path_file = r'C:\Users\lenovo\Desktop\JHON_2030\PROCESAMIENTO_DE_IMAGENES\Talleres\Semana_6\Taller\lena.png'
+    #path_file = r'C:\Users\di-di\OneDrive\Escritorio\imagenes_vision\lena.jpg'
     image_lena = cv2.imread(path_file, 1)
     image_lena_gray = cv2.cvtColor(image_lena, cv2.COLOR_BGR2GRAY)
     image_lena_noisy = noise_generator(image_lena_gray.astype(np.float) / 255)
@@ -191,16 +221,16 @@ if __name__ == '__main__':
     lena_sp_noisy = (255 * lena_sp_noisy).astype(np.uint8)
 
     cv2.imshow('Lena noises', subplot_image(lena_gaussian_noisy, lena_sp_noisy, 'Gaussian Noise', 'Salt-peper Noise'))
-    cv2.waitKey(0)
     
     times_gaussian_noise_filtered,\
     estimation_gaussian_noise_filtered,\
     ECM_Gaussian_Noise = filter_Gaussian_noise(lena_gaussian_noisy,
                                                image_lena_gray,
                                                show_filters=False,
-                                               show_times=True,
+                                               show_times=False,
+                                               show_times_percentage=True,
                                                show_noise_estimation=False,
-                                               show_ECM=False)
+                                               show_sqrt_ECM=False)
 
 
     times_sp_noise_filtered,\
@@ -208,6 +238,9 @@ if __name__ == '__main__':
     ECM_SP_Noise = filter_SP_noise(lena_sp_noisy,
                                    image_lena_gray,
                                    show_filters=False,
-                                   show_times=True,
+                                   show_times=False,
+                                   show_times_percentage=True,
                                    show_noise_estimation=False,
-                                   show_ECM=False)
+                                   show_sqrt_ECM=False)
+
+    cv2.waitKey(0)

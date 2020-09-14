@@ -74,7 +74,7 @@ class filter:
         elapsed_time = time() - start_time
         return function_return, elapsed_time
 
-    def __ECM(self, image_filtered):
+    def __sqrt_ECM(self, image_filtered):
         M = self.__original_image.shape[0]
         N = self.__original_image.shape[1]
         x = 0
@@ -88,17 +88,17 @@ class filter:
         if filter_type == 'gaussian':
             Filter, time = self.__time_execution(self.__Gaussian_filter)
             noise_estimation = abs(Filter - self.__image_noisy)
-            ECM = self.__ECM(Filter)
+            ECM = self.__sqrt_ECM(Filter)
         elif filter_type == 'median':
             Filter, time =  self.__time_execution(self.__Median_filter)
             noise_estimation = abs(Filter - self.__image_noisy)
-            ECM = self.__ECM(Filter)
+            ECM = self.__sqrt_ECM(Filter)
         elif filter_type == 'bilateral':
             Filter, time = self.__time_execution(self.__Bilateral_filter)
             noise_estimation = abs(Filter - self.__image_noisy)
-            ECM = self.__ECM(Filter)
+            ECM = self.__sqrt_ECM(Filter)
         elif filter_type == 'nlm':
             Filter, time = self.__time_execution(self.__NLM_filter)
             noise_estimation = abs(Filter - self.__image_noisy)
-            ECM = self.__ECM(Filter)
+            ECM = self.__sqrt_ECM(Filter)
         return Filter, time, noise_estimation, ECM
