@@ -31,6 +31,7 @@
 
 import cv2
 from time import time
+import numpy as np
 
 #------------------------------------------------------------------------------#
 #                                  FILTER CLASS                                #
@@ -81,7 +82,7 @@ class filter:
             for j in range(N):
                 x += (abs(int(self.__original_image[i][j]) - int(image_filtered[i][j])) ** 2)
 
-        return (x/(M*N))
+        return np.sqrt(x/(M*N))
 
     def filter_type(self, filter_type):
         if filter_type == 'gaussian':

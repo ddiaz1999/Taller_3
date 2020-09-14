@@ -63,8 +63,6 @@ def show_table(title, header, values, labels, sn=False):
     print('\n'+ title)
     print(table, '\n')
 
-
-
 # --------------------------- FILTER GAUSSIAN NOISE -------------------------- #
 
 def filter_Gaussian_noise(noisy_image, original_img, show_filters=False, show_times=False, show_noise_estimation=False, show_ECM=False):
@@ -102,16 +100,18 @@ def filter_Gaussian_noise(noisy_image, original_img, show_filters=False, show_ti
 
     if show_noise_estimation:
         cv2.imshow('Gaussian Noise - Gaussian Filter: Noise estimation',
-                   subplot_image(noisy_image, gaussian_estimate_noise, 'Gaussian Noise', 'Gaussian Filter'))
-        cv2.imshow('Gaussian Noise - Median Filter', subplot_image(noisy_image, median_estimate_noise, 'Gaussian Noise', 'Median Filter'))
-        cv2.imshow('Gaussian Noise - Bilateral Filter', subplot_image(noisy_image, bilateral_estimate_noise, 'Gaussian Noise', 'Bilateral Filter'))
-        cv2.imshow('Gaussian Noise - NLM Filter', subplot_image(noisy_image, nlm_estimate_noise, 'Gaussian Noise', 'NLM Filter'))
+                   subplot_image(noisy_image, gaussian_estimate_noise, 'Gaussian Noise', 'Noise estimation: Gaussian'))
+        cv2.imshow('Gaussian Noise - Median Filter: Noise estimation', subplot_image(noisy_image, median_estimate_noise, 'Gaussian Noise', 'Noise estimation: Median'))
+        cv2.imshow('Gaussian Noise - Bilateral Filter: Noise estimation', subplot_image(noisy_image, bilateral_estimate_noise, 'Gaussian Noise', 'Noise estimation: Bilateral'))
+        cv2.imshow('Gaussian Noise - NLM Filter: Noise estimation', subplot_image(noisy_image, nlm_estimate_noise, 'Gaussian Noise', 'Noise estimation: NLM'))
 
         cv2.waitKey(0)
 
     if show_ECM:
-        show_table('Mean Square Error: Gaussian Noise', ['Filter', 'Mean Square Error'],
-                   ECM, ['Gaussian', 'Median', 'Bilateral', 'NLM'], sn=True)
+        show_table('Square Root Mean Square Error: Gaussian Noise', ['Filter', 'Square Root Mean Square Error'],
+                   ECM, ['Gaussian', 'Median', 'Bilateral', 'NLM'], sn=False)
+        filters = ['Gaussian', 'Median', 'Bilateral', 'NLM']
+        print(f'The filter with the lowest sqrt(ECM) is {filters[ECM.index(min(ECM))]} with {min(ECM)}')
 
     return times_gaussian_noise_filtered, estimation_gaussian_noise_filtered, ECM
 
@@ -135,10 +135,10 @@ def filter_SP_noise(noisy_image, original_img, show_filters=False, show_times=Fa
     noisy_filtered_nlm, nlm_time, nlm_estimate_noise, nlm_ECM = sp_noisy_filtered.filter_type('nlm')
 
     if show_filters:
-        cv2.imshow('S&P Noise - Gaussian Filter', subplot_image(lena_sp_noisy, noisy_filtered_gaussian, 'S&P Noise', ' Gaussian Filter'))
-        cv2.imshow('S&P Noise - Median Filter', subplot_image(lena_sp_noisy, noisy_filtered_median, 'S&P Noise', 'Median Filter'))
-        cv2.imshow('S&P Noise - Bilateral Filter', subplot_image(lena_sp_noisy, noisy_filtered_bilateral, 'S&P Noise', 'Bilateral Filter'))
-        cv2.imshow('S&P Noise - NLM Filter', subplot_image(lena_sp_noisy, noisy_filtered_nlm, 'S&P Noise', 'NLM Filter'))
+        cv2.imshow('S&P Noise - Gaussian Filter', subplot_image(lena_sp_noisy, noisy_filtered_gaussian, 'S&P Noise', ' Gaussian'))
+        cv2.imshow('S&P Noise - Median Filter', subplot_image(lena_sp_noisy, noisy_filtered_median, 'S&P Noise', 'Median'))
+        cv2.imshow('S&P Noise - Bilateral Filter', subplot_image(lena_sp_noisy, noisy_filtered_bilateral, 'S&P Noise', 'Bilateral'))
+        cv2.imshow('S&P Noise - NLM Filter', subplot_image(lena_sp_noisy, noisy_filtered_nlm, 'S&P Noise', 'NLM'))
 
         cv2.waitKey(0)
 
@@ -153,19 +153,22 @@ def filter_SP_noise(noisy_image, original_img, show_filters=False, show_times=Fa
 
     if show_noise_estimation:
         cv2.imshow('S&P Noise - Gaussian Filter: Noise estimation',
-                   subplot_image(noisy_image, gaussian_estimate_noise, 'S&P Noise', 'Noise estimation: Gaussian Filter'))
+                   subplot_image(noisy_image, gaussian_estimate_noise, 'S&P Noise', 'Noise estimation: Gaussian'))
         cv2.imshow('S&P Noise - Median Filter: Noise estimation',
-                   subplot_image(noisy_image, median_estimate_noise, 'S&P Noise', 'Noise estimation: Median Filter'))
+                   subplot_image(noisy_image, median_estimate_noise, 'S&P Noise', 'Noise estimation: Median'))
         cv2.imshow('S&P Noise - Bilateral Filter: Noise estimation',
-                   subplot_image(noisy_image, bilateral_estimate_noise, 'S&P Noise', 'Noise estimation: Bilateral Filter'))
+                   subplot_image(noisy_image, bilateral_estimate_noise, 'S&P Noise', 'Noise estimation: Bilateral'))
         cv2.imshow('S&P Noise - NLM Filter: Noise estimation',
-                   subplot_image(noisy_image, nlm_estimate_noise, 'S&P Noise', 'Noise estimation: NLM Filter'))
+                   subplot_image(noisy_image, nlm_estimate_noise, 'S&P Noise', 'Noise estimation: NLM'))
 
         cv2.waitKey(0)
 
     if show_ECM:
-        show_table('Mean Square Error: Salt & Peper Noise', ['Filter', 'Mean Square Error'],
-                   ECM, ['Gaussian', 'Median', 'Bilateral', 'NLM'], sn=True)
+        show_table('Square Root Mean Square Error: Salt & Peper Noise', ['Filter', 'Square Root Mean Square Error'],
+                   ECM, ['Gaussian', 'Median', 'Bilateral', 'NLM'], sn=False)
+
+        filters = ['Gaussian', 'Median', 'Bilateral', 'NLM']
+        print(f'The filter with the lowest sqrt(ECM) is {filters[ECM.index(min(ECM))]} with {min(ECM)}')
 
     return times_gaussian_noise_filtered, estimation_gaussian_noise_filtered, ECM
 
@@ -176,8 +179,9 @@ def filter_SP_noise(noisy_image, original_img, show_filters=False, show_times=Fa
 
 if __name__ == '__main__':
 
-    path_file = r'C:\Users\lenovo\Desktop\JHON_2030\PROCESAMIENTO_DE_IMAGENES\Talleres\Semana_6\Taller\lena.png'
-    #path_file = r'C:\Users\di-di\OneDrive\Escritorio\imagenes_vision\lena.jpg'
+    filters = ['Gaussian', 'Median', 'Bilateral', 'NLM']
+    #path_file = r'C:\Users\lenovo\Desktop\JHON_2030\PROCESAMIENTO_DE_IMAGENES\Talleres\Semana_6\Taller\lena.png'
+    path_file = r'C:\Users\di-di\OneDrive\Escritorio\imagenes_vision\lena.jpg'
     image_lena = cv2.imread(path_file, 1)
     image_lena_gray = cv2.cvtColor(image_lena, cv2.COLOR_BGR2GRAY)
     image_lena_noisy = noise_generator(image_lena_gray.astype(np.float) / 255)
@@ -194,15 +198,16 @@ if __name__ == '__main__':
     ECM_Gaussian_Noise = filter_Gaussian_noise(lena_gaussian_noisy,
                                                image_lena_gray,
                                                show_filters=False,
-                                               show_times=False,
+                                               show_times=True,
                                                show_noise_estimation=False,
-                                               show_ECM=True)
+                                               show_ECM=False)
+
 
     times_sp_noise_filtered,\
     estimation_sp_noise_filtered,\
     ECM_SP_Noise = filter_SP_noise(lena_sp_noisy,
                                    image_lena_gray,
                                    show_filters=False,
-                                   show_times=False,
+                                   show_times=True,
                                    show_noise_estimation=False,
                                    show_ECM=False)
